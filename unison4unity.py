@@ -25,7 +25,7 @@ import sys
 import time
 import logging
 
-logging.basicConfig(filename='/tmp/unison-wrap.log',level=logging.DEBUG)
+logging.basicConfig(filename='/tmp/unison4unity.log',level=logging.DEBUG)
 POOL_DELAY = 120 # seconds
 
 class UnisonProfile:
@@ -109,6 +109,8 @@ class UnisonWrap:
           self.ind.set_attention_icon("dialog-warning")
         else:
           self.ind.set_attention_icon("account-logged-in")
+      ## next iteration
+      return True
 
     ## List profile files in unison directory
     def listUnisonProfiles(self):
