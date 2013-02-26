@@ -28,6 +28,11 @@ import logging
 logging.basicConfig(filename='/tmp/unison-wrap.log',level=logging.DEBUG)
 POOL_DELAY = 120 # seconds
 
+class UnisonProfile:
+    def __init__(self, name, localDir):
+      self.name = name
+      self.localDir = localDir
+
 class UnisonWrap:
     def __init__(self):
       self.timestamp = time.ctime()
@@ -46,6 +51,7 @@ class UnisonWrap:
         ts_item = gtk.MenuItem("Last Update: "+self.timestamp)
         ts_item.show()
         self.menu.append(ts_item)
+
         ## profiles
         for p in self.unisonProfiles :
           logging.debug("add ["+p+"]")  
@@ -110,7 +116,8 @@ class UnisonWrap:
       try:
         os.chdir(os.path.expanduser('~/.unison'))
         for files in glob.glob("*.prf"):
-          profiles.append(re.sub(".prf$","",files))
+          if files != "default.prf"
+            profiles.append(re.sub(".prf$","",files))
         return profiles
       except:
         logging.error("Failed to list unison profiles")
