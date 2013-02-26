@@ -116,7 +116,7 @@ class UnisonWrap:
       try:
         os.chdir(os.path.expanduser('~/.unison'))
         for files in glob.glob("*.prf"):
-          if files != "default.prf"
+          if files != "default.prf":
             profiles.append(re.sub(".prf$","",files))
         return profiles
       except:
