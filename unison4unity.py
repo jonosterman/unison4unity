@@ -80,10 +80,10 @@ class UnisonWrap:
         gtk.main()
 
     def openProfile(self, widget, profile):
-        subprocess.call(["unison","-ui","graphic",profile])
+        subprocess.Popen(["unison-gtk",profile])
 
     def openUnison(self, widget):
-        subprocess.call(["unison","-ui","graphic"])
+        subprocess.Popen(["unison-gtk"])
 
     def quit(self, widget):
         sys.exit(0)
@@ -99,16 +99,21 @@ class UnisonWrap:
       error = 0
       for p in self.unisonProfiles :
         logging.debug("Start unison for profile [" + p +"]")
-        if subprocess.call(["unison","-ui","text","-batch",p]) != 0:
+        print "Start unison for profile [" + p +"]"
+        if subprocess.call(["unison","-silent","-ui","text","-batch",p]) != 0:
           logging.error("unison call failed")
           error += 1
+          print "unison [" + p +"] Failed"
         else:
           logging.debug("unison call succeed")
-        ## update icon
-        if error > 0:
-          self.ind.set_attention_icon("dialog-warning")
-        else:
-          self.ind.set_attention_icon("account-logged-in")
+          print "unison [" + p +"] OK"
+        # wait 2 seconds or it will break SSH and diplay warnings
+        time.sleep(2)
+      ## update icon
+      if error > 0:
+        self.ind.set_attention_icon("dialog-warning")
+      else:
+        self.ind.set_attention_icon("account-logged-in")
       ## next iteration
       return True
 
