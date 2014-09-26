@@ -31,7 +31,7 @@ import traceback
 
 #logging.basicConfig(filename='/tmp/unison4unity.log',level=logging.DEBUG)
 logging.basicConfig(format='[%(levelname)s] %(message)s',level=logging.DEBUG)
-POOL_DELAY = 3 # 120 seconds
+POOL_DELAY = 120 # 120 seconds
 runCnt = 0 # how many time it already looped
 queue = Queue()
 
