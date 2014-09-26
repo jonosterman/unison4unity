@@ -27,10 +27,11 @@ import datetime
 import logging
 import pynotify
 from multiprocessing import Process, Queue
+import traceback
 
 #logging.basicConfig(filename='/tmp/unison4unity.log',level=logging.DEBUG)
 logging.basicConfig(format='[%(levelname)s] %(message)s',level=logging.DEBUG)
-POOL_DELAY = 120 # 120 seconds
+POOL_DELAY = 3 # 120 seconds
 runCnt = 0 # how many time it already looped
 queue = Queue()
 
@@ -190,6 +191,7 @@ class UnisonWrap:
 					list += sub
 			except:
 				logging.error("Failed to sync profile [%s]",profile)
+				print traceback.format_exc()
 				list.append({ 'error': profile })
 		## release lock
 		#logging.debug("Add files list in queue for main thread.")
@@ -245,10 +247,42 @@ class UnisonWrap:
 						sk = m.group(2)
 						fa = m.group(3)
 						logging.debug("unison completed [%s transferred, %s skipped, %s failed]",tr,sk,fa)
+						self.handleEcryptFS(files, profile)
 						return files
 					#else:
 					#	print("[unknown-line] {0}".format(line))
 		return None
+
+
+	## Attempt to find decrypted file when a encrypted file has been changed.
+  ## this way user will be displayed with the decrypted file instead of
+  ## the cryptic filename from ecryptfs. For this we have to extract root
+  ## directory from profile file and use command line tool 'ecryptfs-find'.
+	def handleEcryptFS(self, files, profile):
+		for e in files:
+			filename = e['file']
+			if filename.startswith('ECRYPTFS_FNEK_ENCRYPTED.'):
+				## find configuration file and extract local root
+				profileFile = os.path.expanduser('~/.unison')+'/'+profile+'.prf'
+				f = open(profileFile,"r")
+				content = f.read()
+				f.close()
+				root = None
+				for line in content.split("\n"):
+					if line.startswith("root = /"):
+						root = line[7:]
+				if root == None:
+					logging.error("Failed to find root for profile [%s]",profile)
+				else:
+					absPath = root+"/"+filename.strip()
+					try:
+						result = subprocess.check_output(["ecryptfs-find",absPath]).strip()
+						e['encrypted'] = filename
+						e['file'] = result
+					except:
+						logging.error("Failed to find unencrypted file for [%s]",absPath)
+										
+					
 
 
 ## main
