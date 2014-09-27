@@ -144,13 +144,13 @@ class UnisonWrap:
 			#logging.debug("run #%d. skip since already syncing",	runCnt)
 			return True
 		elif queue.qsize() > 1 : 
-			logging.debug("run #%d. should probably unlock it and process list in queue [size: %d] ?...",	runCnt, queue.qsize())
 			## remove both object in queue (must be 2 : 'lock' and 'file list')			
 			list = []
 			while queue.qsize() > 0:
 				a = queue.get()
 				if a != "lock":
 					list = a
+					logging.debug("run #%d. found file list in queue [list size: %d]",	runCnt, len(list))
 			## rebuild UI
 			self.menuStd(list)
 			## continue			
